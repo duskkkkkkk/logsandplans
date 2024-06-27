@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>当日计划的设定</title>
+</head>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/settoday.css') }}">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body>
+<button class="back">返回</button>
+<div class="settoday">
+    <div class="change items active">
+        <button>点击设置当日计划</button>
+    </div>
+    <div class="items set">
+        <h2>开始设置今日的计划吧</h2>
+        <table>
+            <thead>
+            <tr>
+                <td>条目名称</td>
+                <td>计划类型</td>
+                <td>优先级</td>
+            </tr>
+            </thead>
+        </table>
+        <ul class="input_area">
+            <li>
+                <form>
+                <input type="text" placeholder="请输入条目名称" name="plan_name" value="">
+                <input type="text" placeholder="请设定类型" name="plan_type" value="">
+                <input type="text" placeholder="请设定优先级" name="priority" value="">
+                </form>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <button class="add">+</button>
+            </li>
+        </ul>
+        <button class="submit">确认设定</button>
+    </div>
+</div>
+<script>
+        // 需要做到点击设置当日计划的按钮来切换渲染的页面
+        // 获取元素
+        const change_btn = document.querySelector('.settoday .change') // 获取到change按钮
+        const set_page = document.querySelector('.settoday div:nth-child(2) ')
+        // change按钮添加点击事件
+        change_btn.addEventListener('click',function(){
+            // 消除change内的active类名
+            change_btn.classList.remove('active')
+            // 为设置页面添加active类名
+            set_page.classList.add('active')
+        })
+        // 通过点击li标签内的+按钮来向输入li中添加元素
+        // 获取元素
+        const add_btn = document.querySelector('.settoday .add')
+        const set_ul = document.querySelector('.settoday ul')
+        let results = [] // 存放已有结果的数组
+        const input_name = '<input type="text" placeholder="请输入条目名称" name="plan_name">'
+        const input_type = '<input type="text" placeholder="请设定类型" name="plan_type">'
+        const input_priority = '<input type="text" placeholder="请设定优先级" name="priority">'
+        // 为添加按钮增添点击事件
+        add_btn.addEventListener('click',function(){
+            // 选择input标签时一定要注意使用属性选择器
+            // 获取到最新一条输入的各元素
+            let get_lis = document.querySelectorAll('.set .input_area li')
+            let length = get_lis.length
+            let get_name = document.querySelector(`.set .input_area li:nth-child(${length}) input:nth-child(1)`)
+            let get_type = document.querySelector(`.set .input_area li:nth-child(${length}) input:nth-child(2)`)
+            let get_priority = document.querySelector(`.set .input_area li:nth-child(${length}) input:nth-child(3)`)
+            let result = {'name':get_name.value,'type':get_type.value,'priority':get_priority.value}
+            results[length-1] = result // 向结果数组中添加条目对象
+            console.log(results)
+            set_ul.innerHTML +=
+            `<li>
+                ${input_name}
+                ${input_type}
+                ${input_priority}
+            </li>`
+            for( let i = 0 ; i < results.length; i++){
+                // 为li标签中的input的value逐个赋值
+               let get_name = document.querySelector(`.set .input_area li:nth-child(${i+1}) input:nth-child(1)`)
+               let get_type = document.querySelector(`.set .input_area li:nth-child(${i+1}) input:nth-child(2)`)
+               let get_priority = document.querySelector(`.set .input_area li:nth-child(${i+1}) input:nth-child(3)`)
+               get_name.value = results[i]['name']
+               get_type.value = results[i]['type']
+               get_priority.value = results[i]['priority']
+            }
+        })
+        // 获取到确认设定的按钮
+        const submit_btn = document.querySelector('.set .submit')
+
+        // 为按钮添加点击事件 使用axios函数之后 是会直接返回前端界面 故而页面跳转也选择在前端界面实现
+        submit_btn.addEventListener('click',function(){
+            // 这个只需要管将results传到后端 凡是不是变量的东西一律用字符串表示
+            console.log(results)
+            // 无论如何result都会额外读取当前li中的最后一个元素
+            const get_lis = document.querySelectorAll('.set .input_area li')
+            let length = get_lis.length
+            const get_name = document.querySelector(`.set .input_area li:nth-child(${length}) input:nth-child(1)`)
+            const get_type = document.querySelector(`.set .input_area li:nth-child(${length}) input:nth-child(2)`)
+            const get_priority = document.querySelector(`.set .input_area li:nth-child(${length}) input:nth-child(3)`)
+            result = {'name':get_name.value,'type':get_type.value,'priority':get_priority.value}
+            console.log(result)
+            results[results.length] = result
+            axios({
+                url:'{{ url_for('view_u.set_today') }}',
+                method: 'POST',
+                data:{
+                    results: results
+                }
+            }).then(result=>{
+                console.log('提交成功')
+            })
+            })
+
+        const get_back = document.querySelector('.back')
+        get_back.addEventListener('click',function(){
+        window.location.href = '{{ url_for('view_u.firstpage') }}'
+        })
+    </script>
+</body>
+</html>

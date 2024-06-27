@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设定过的计划</title>
+</head>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/showtoday.css') }}">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body>
+<button class="back">返回</button>
+  <div class="head">
+    <button class="left"><</button>
+    <div class="showbox">
+      <h2>回顾往期制定的计划吧</h2>
+      <table>
+        <thead>
+          <tr>
+            <td>计划名</td>
+            <td>计划类型</td>
+            <td>优先级</td>
+            <td>完成情况</td>
+          </tr>
+        </thead>
+      </table>
+      <ul>
+          <!-- 用三个div分别展示计划条目名 计划类型 以及 计划的优先级 隐藏的div用于存放计划条目的id 便于查询-->
+      </ul>
+    </div>
+    <button class="right">></button>
+  </div>
+  <ul class="tail">
+  </ul>
+<script>
+    // 首先需要通过后端获取到所有的当日计划的数据
+    let plans = []
+    let details = []
+    let current_id = 0
+    function add_element(details){
+        // 定义一个填充头部内容的函数
+        // 注意需要完善 当用户不是第一次修改日程的完成情况时 需要将上一次的情况记录下来
+        const element_id = '<div class="hide"></div>'
+        const element_name = '<div class="showname show"></div>'
+        const element_type = '<div class="showtype show"></div>'
+        const element_priority  = '<div class="showprio show"></div>'
+        let element_check = ''
+        for(let i = 0; i<details.length;i++){
+            const get_showbox = document.querySelector('.showbox ul')
+            if(details[i]['finished']){
+                element_check = '<input type="checkbox" data-index="" checked>'
+            }else{
+                element_check = '<input type="checkbox" data-index="">'
+            }
+            get_showbox.innerHTML += `
+               <li>
+               ${element_id}
+               ${element_name}
+               ${element_type}
+               ${element_priority}
+               ${element_check}
+               </li>`
+            const get_lis = document.querySelectorAll('.showbox li')
+            let length = get_lis.length
+              // 对所有li标签内的最新一条进行赋值
+            const input_id = document.querySelector(`.head .showbox li:nth-child(${length}) .hide`)
+            const input_name = document.querySelector(`.head .showbox li:nth-child(${length}) .showname`)
+            const input_type = document.querySelector(`.head .showbox li:nth-child(${length}) .showtype`)
+            const input_priority = document.querySelector(`.head .showbox li:nth-child(${length}) .showprio`)
+            const input_check = document.querySelector(`.head .showbox li:nth-child(${length}) input[type='checkbox']`)
+            input_id.innerHTML = details[i]['id']
+            input_name.innerHTML = details[i]['name']
+            input_type.innerHTML = details[i]['type']
+            input_priority.innerHTML = details[i]['priority']
+            // 为checkbox添加索引
+            input_check.dataset.index = i+1
+      }// 循环结束赋值结束
+      //同时和之前一样为各个input添加点击事件
+        const get_input = document.querySelectorAll('.head .showbox li input[type="checkbox"]')
+        for(let i = 0; i<get_input.length;i++){
+            get_input[i].addEventListener('click',function(e){
+          // e表示事件对象 事件对象内的target属性会指出受到当前事件影响的元素
+              let index = e.target.dataset.index
+              let flag = e.target.checked
+              // 获取到对应位置的其他元素
+              const input_id = document.querySelector(`.head .showbox li:nth-child(${index}) .hide`)
+              // 获取元素内的信息
+              let detail_id = input_id.innerHTML
+              // 将此信息传给后端进行相应的修改
+              axios({
+                  url:'{{ url_for('view_u.change_finish') }}',
+                  method:'POST',
+                  data: {
+                      detail_id: detail_id,
+                      finished: flag
+                  }
+              }).then(result=>{
+                  console.log(result.data.msg)
+                  // 因为此处有对完成情况的简略展示 故而应当同时对完成情况进行修改 需要传递一个对象包含finished和unfinished
+                  // 完善checkbox的点击事件 此页面中还需获取到finished数据并将其添加到对应的盒子内
+                  // 定位到对应盒子通过current_id 来完成
+                  const change_f = document.querySelector(`.tail li:nth-child(${current_id+1}) p:nth-child(3)`)
+                  const change_uf = document.querySelector(`.tail li:nth-child(${current_id+1}) p:nth-child(4)`)
+                  change_f.innerHTML = '已完成:'+result.data.finished
+                  change_uf.innerHTML = '未完成:'+result.data.unfinished
+              })
+          })
+        }
+    }
+    // 将通过plan_id查询细节的操作封装为函数
+    function search_details(plan_id){
+        axios({
+            url:'{{ url_for('view_u.searchtoday_details') }}',
+            method:'POST',
+            data:{
+                id:plan_id
+            }
+        }).then(result=>{
+            // 后端会传一个details的数组过来
+            change_details = result.data.details
+            // 首先清空当前ul内的值
+            const get_showbox = document.querySelector('.showbox ul')
+            get_showbox.innerHTML = ''
+            add_element(change_details) // 使用函数填充数据即可
+        })
+    }
+    function change_use(id){
+        // 通过id的大小来设置按钮的可用性
+        const left_btn = document.querySelector('.left')
+        const right_btn = document.querySelector('.right')
+        if(id === 0){
+            // 说明当前为最左选中 左不可右可
+            left_btn.disabled = true
+            right_btn.disabled = false
+        }
+        else if(id === plans.length-1){
+            left_btn.disabled = false
+            right_btn.disabled = true
+        }
+        else{
+            left_btn.disabled = false
+            right_btn.disabled = false
+        }
+    }
+    // 修改active样式的函数 需传入对应盒子的id 以及之前盒子的id
+    function change_active(id,pre){
+        // 获取盒子元素
+        const get_lis = document.querySelectorAll('.tail li')
+        get_pre = get_lis[pre]
+        get_now = get_lis[id]
+        // 将get_pre中的active样式转移到get_now内
+        get_pre.classList.remove('active')
+        get_now.classList.add('active')
+    }
+    // 页面初始化函数
+    axios({
+        url:'{{ url_for('view_u.show_today') }}',
+        method:'POST'
+    }).then(result=>{
+        // 后端获取的当日计划通过列表传来
+        plans = result.data.plans
+        console.log(plans)
+        // 后端同时传递最新的记录的具体细节
+        details = result.data.details
+        // 根据li标签的个数来渲染li标签的个数 同时填充内容
+        console.log(plans.length)
+        for(let i = 0; i<plans.length; i++){
+            const content_id = `<p class='hide'>${plans[i].id}</p>`
+            const content_date = `<p>${plans[i].date}</p>`
+            const content_finished = `<p>已完成${plans[i].finished}</p>`
+            const content_unfinished = `<p>未完成${plans[i].unfinished}</p>`
+            // 向ul内添加元素
+            const get_tail = document.querySelector('.tail')
+            get_tail.innerHTML += `<li data-index='${i}'>
+                ${content_id}
+                ${content_date}
+                ${content_finished}
+                ${content_unfinished}
+            </li>`
+        }// 循环结束 底部内容填充结束
+        // 头部部分默认显示最新一天的内容==》后端的列表需先进行一次reverse操作
+        add_element(details)
+        // 同时为设置current_id = 0 时 则将向左的按钮设置为禁用
+        const left = document.querySelector('.left')
+        left.disabled = true
+        // 向首个li标签添加边框样式
+        const input_active = document.querySelector('.tail li')
+        input_active.classList.add('active')
+        // 为下面各个li标签添加点击事件 使之能够渲染对应的页面
+        const get_lis = document.querySelectorAll('.tail li')
+        for(let i = 0; i<get_lis.length;i++){
+            get_lis[i].addEventListener('click',function(e){
+                // 首先获取到所点击盒子的index 再通过index来获取到列表中对应日程的id
+                index = e.target.dataset.index
+                {# print(index) 在页面内使用pring函数就可实现打印当页内容的功能 #}
+                // 修改样式
+                pre_id = current_id
+                current_id = index
+                change_active(current_id,pre_id)
+                plan_id = plans[index]['id']
+                // 将id送往后端获取到对应的细节数据
+                search_details(plan_id)
+            })
+        }
+    })
+    // 为左右按钮添加点击事件 核心在于修改current_id
+    const left_btn = document.querySelector('.left')
+    const right_btn = document.querySelector('.right')
+    left_btn.addEventListener('click',function(e){
+        // 当按钮可用时才起效
+        if(e.target.disabled === false){
+            current_id -= 1
+            plan_id = plans[current_id]['id']
+            // 修改按钮可用性
+            change_use(current_id)
+            // 获取具体条目 并填充数据
+            search_details(plan_id)
+            // 修改样式
+            pre_id = current_id + 1
+            change_active(current_id,pre_id)
+        }
+    })
+    right_btn.addEventListener('click',function(e){
+        // 当按钮可用时才起效
+        if(e.target.disabled === false){
+            current_id += 1
+            plan_id = plans[current_id]['id']
+            // 修改按钮可用性
+            change_use(current_id)
+            // 获取具体条目 并填充数据
+            search_details(plan_id)
+            // 修改样式
+            pre_id = current_id - 1
+            change_active(current_id,pre_id)
+        }
+    })
+    const get_back = document.querySelector('.back')
+    get_back.addEventListener('click',function(){
+      window.location.href = '{{ url_for('view_u.firstpage') }}'
+    })
+</script>
+</body>
+</html>

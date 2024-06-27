@@ -1,0 +1,21 @@
+此文件夹用于存放各种用于实现小功能的模板 待之后再进行拼接
+为优化操作 除开showlogs中添加的返回按钮为回到logset界面 其余的返回按钮均为回到firstpage
+返回按钮的样式
+.back {
+      display:block;
+      margin: 5px 5px;
+      width: 80px;
+      height: 36px;
+      border: none;
+      border-radius: 5px;
+      background-color: rgb(46, 156, 235);
+      color: white;
+      cursor: pointer;
+    }
+返回按钮
+<button class="back">返回</button>
+为返回按钮添加事件
+  const get_back = document.querySelector('.back')
+  get_back.addEventListener('click',function(){
+      window.location.href = '{{ url_for('view_u.firstpage') }}'
+  })

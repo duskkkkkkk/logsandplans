@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>首页 展示用户的基本信息 以及提供各种接口</title>
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/firstpage.css') }}">
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div class="firstpage">
+    <div class="base_info">
+      <img class="icon" src="{{ url_for('static',filename='images/pic1.png') }}">
+      <div class="login">
+        <div class="username">用户名：</div>
+        <div class="time">上次登录：</div>
+      </div>
+      <div class="logout">注销</div>
+    </div>
+    <ul class="alert">
+      <li class="todaydetail"></li>
+      <li class="futuredetail"></li>
+      <li class="dailydetail"></li>
+    </ul>
+    <ul class="addnew">
+      <li class="addtoday"></li>
+      <li class="addfuture">创建未来日程</li>
+      <li class="adddaily">创建日常计划</li>
+    </ul>
+    <ul class="jump">
+      <li class="today">今日计划</li>
+      <li class="future">未来日程</li>
+      <li class="daily">日常计划</li>
+      <li class="logset">日志集</li>
+    </ul>
+  </div>
+   <script>
+      let user_info = {}
+      let finished = {}
+      // 初始化界面的函数
+      axios({
+          url:'{{ url_for('view_u.firstpage') }}',
+          method:'POST'
+      }).then(result=>{
+          // 需要获得两组数据 分别为用户的基本信息 用户各个计划的完成情况
+          user_info = result.data.user
+          finished = result.data.finished
+          // 分别填充各部分并添加时间
+          // 填充头部
+          const get_name = document.querySelector('.base_info .username')
+          const get_time = document.querySelector('.base_info .time')
+          get_name.innerHTML += user_info.name
+          get_time.innerHTML += user_info.time
+          // 填充中间部分
+          // 当日计划若未制定 则 显示未制定 否则显示完成情况 制定与否由flag指明
+          const get_today = document.querySelector('.alert .todaydetail')
+          if(finished['today']['flag']){
+              console.log(finished['today']['flag'])
+              get_today.innerHTML = `当日计划已制定<br>已完成:${finished['today']['finished']}<br>未完成:${finished['today']['unfinished']}`
+              // 制定当日计划之后无法再次制定当日计划 故而将制定按钮禁用
+              const get_addtoday = document.querySelector('.addnew .addtoday')
+              get_addtoday.innerHTML = '完成今日计划吧'
+              // 同时将下方的按钮设置为完成今日计划
+              get_addtoday.addEventListener('click',function(){
+              window.location.href = '{{ url_for('view_u.get_details') }}'
+                })
+          }else{
+              get_today.innerHTML = '当日计划未制定'
+              // 同时需要修改一下样式
+              get_today.style.paddingTop = '50px'
+              // 并将下方按钮设置为制定今日计划的按钮
+              const get_addtoday = document.querySelector('.addnew .addtoday')
+              get_addtoday.innerHTML = '制定今日计划吧'
+              // 同时将下方的按钮设置为完成今日计划
+              get_addtoday.addEventListener('click',function(){
+              window.location.href = '{{ url_for('view_u.set_today') }}'
+              })
+          }
+          // 未来计划 直接指出到达提醒日期的即可
+          const get_future = document.querySelector('.alert .futuredetail')
+          get_future.innerHTML = `${finished['future']}条未来日程提醒中`
+          // 日常计划与未来计划相同 获取到所有reminded为0的计划即可
+          const get_daily = document.querySelector('.alert .dailydetail')
+          get_daily.innerHTML = `${finished['daily']}条日常计划提醒中`
+          // 为页面中的各种按钮添加事件
+          // 注销按钮
+          const get_logout = document.querySelector('.logout')
+          get_logout.addEventListener('click',function(){
+              window.location.href = '{{ url_for('view_u.logout') }}'
+          })
+          // 添加未来日程的按钮
+          const get_addfuture = document.querySelector('.addnew .addfuture')
+          get_addfuture.addEventListener('click',function(){
+              window.location.href = '{{ url_for('view_u.setfuture') }}'
+          })
+          // 添加日常计划的按钮
+          const get_adddaily = document.querySelector('.addnew .adddaily')
+          get_adddaily.addEventListener('click',function(){
+              window.location.href = '{{ url_for('view_u.setdaily') }}'
+          })
+          // 查看所有今日计划的按钮
+          const get_showtoday = document.querySelector('.jump .today')
+          get_showtoday.addEventListener('click',function(){
+              window.location.href = '{{ url_for('view_u.show_today') }}'
+          })
+          // 查看所有未来计划的按钮
+          const get_showfuture = document.querySelector('.jump .future')
+          get_showfuture.addEventListener('click',function(){
+              window.location.href = '{{ url_for('view_u.showfuture') }}'
+          })
+          // 查看所有日常计划的按钮
+          const get_showdaily = document.querySelector('.jump .daily')
+          get_showdaily.addEventListener('click',function(){
+              window.location.href = '{{ url_for('view_u.showdaily') }}'
+          })
+          // 查看所有日志集的按钮
+          const get_logset = document.querySelector('.jump .logset')
+          get_logset.addEventListener('click',function(){
+              window.location.href = '{{ url_for('view_u.showset') }}'
+          })
+      })
+  </script>
+</body>
+</html>

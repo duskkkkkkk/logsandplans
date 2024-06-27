@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日志集合的展示与创建</title>
+</head>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/logset.css') }}">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body>
+  <button class="back">返回</button>
+  <div class="showbox">
+    <h2>日志管理</h2>
+    <ul>
+      <!-- li标签内需要展示集合的名字 创建时间 更新时间 日志个数 并且创建li标签时需要为其添加点击事件 点击时以get的方式向后端传输信息 以实现页面跳转 -->
+       <div class="add_btn" title="添加日志集">+</div>
+       <div class="input_info">
+        <input type="text" placeholder="请输入日志集名字">
+        <button>确认创建</button>
+       </div>
+    </ul>
+  </div>
+  <script>
+    let details = []
+    function full_showbox(new_details){
+        // 填充showbox的函数 details为一个数组 其中的元素为对象 含有集合所需的各种信息
+        // 注意ul中初始就含有两个div
+        const add = '<div class="add_btn" title="添加日志集">+</div>'
+        const input_info = `<div class="input_info">
+        <input type="text" placeholder="请输入日志集名字">
+        <button>确认创建</button>
+       </div>`
+        const get_ul = document.querySelector('.showbox ul')
+        get_ul.innerHTML = ''
+        for(let i = 0; i<details.length; i++){
+            // 设置自定义属性 需要查找时可直接通过这个自定义属性来进入对应的页面
+            get_ul.innerHTML += `<li data-index=${i}>
+            <div class="showname">${new_details[i]['name']}</div>
+            <div class="showimg"><img class="delete" src="{{ url_for('static',filename='images/delete.svg') }}" title="删除" data-index=${i}></div>
+            <div class="showcreate">创建时间:${new_details[i]['create']}</div>
+            <div class="showupdate">更新时间:${new_details[i]['update']}</div>
+            <div class="shownum">日志数目:${new_details[i]['num']}</div>
+            </li>`
+        }
+        // 在加上原生的两个div
+        get_ul.innerHTML += add
+        get_ul.innerHTML += input_info
+        // 每次重新填充页面时为两个按钮添加事件
+        // 为添加日志集合的按钮添加事件
+        const add_btn = document.querySelector('.showbox .add_btn')
+        add_btn.addEventListener('click',function(e){
+        // 移除input_info的无法显示状态 并将本体的display设置为none
+        e.target.style.display = 'none';
+        const input_name = document.querySelector('.input_info')
+        input_name.style.display = 'block';
+        })
+        // 同时为所有的li标签添加点击事件
+         for(let i = 0;i<details.length;i++){
+            const get_li = document.querySelector(`.showbox ul li:nth-child(${i+1})`)
+            get_li.addEventListener('click',function(e){
+                // 这里点击跳转到渲染集合具体内容的页面 注意这里还有一个函数
+                let index = Number(e.target.dataset.index)
+                window.location.href = '{{ url_for('view_u.showcontent') }}'+'?id='+details[index]['id']
+            })
+        }
+        // 为提交按钮添加事件
+        const submit_btn = document.querySelector('.input_info button')
+        submit_btn.addEventListener('click',function(){
+            // 提交按钮需获取到input内输入的名字
+            const get_inputname = document.querySelector('.input_info input[type="text"]')
+            let name = get_inputname.value
+            axios({
+                url:'{{ url_for('view_u.createset') }}',
+                method:'POST',
+                data:{
+                    name: name
+                }
+            }).then(result=>{
+                // 后端需返回添加日志集之后的details 并依此修改页面布局 同时需要为新创建的日志上的元素添加相应的事件
+                details = result.data.details
+                full_showbox(details)
+                // 找到最新的日志
+                let index = details.length
+                const find_new = document.querySelector(`.showbox ul li:nth-child(${index})`)
+                // 添加盒子点击事件
+                find_new.addEventListener('click',function(e){
+                    let index = Number(e.target.dataset.index)
+                    window.location.href='{{ url_for('view_u.showcontent') }}'+'?id='+details[index]['id']
+                })
+                // 添加标签删除事件 需要传入的是对应盒子在details内的下标
+                add_delete(index-1)
+            })
+        })
+        // 为所有的删除按钮再次添加事件
+        for(let i = 0; i<details.length; i++){
+            add_delete(i)
+        }
+    }
+    function add_delete(i){
+        // 需传入index以定位到对应的i
+        const get_deletesvg = document.querySelector(`.showbox ul li:nth-child(${i+1}) .showimg`)
+        get_deletesvg.addEventListener('click',function(e){
+            // 首先就要阻止事件冒泡的父盒子
+            e.stopImmediatePropagation()
+            // 首先传递消息到后端将对应的日志夹删除
+            index = e.target.dataset.index
+            plan_id = details[index]['id']
+            axios({
+                url: '{{ url_for('view_u.deleteset') }}',
+                method:'POST',
+                data:{
+                    plan_id: plan_id
+                }
+            }).then(result=>{
+                // 重新获取到后端传递的details数组 并改变页面布局
+                details = result.data.details
+                full_showbox(details)
+            })
+        })
+
+    }
+    // 初始化界面的函数
+    axios({
+        url: '{{ url_for('view_u.showset') }}',
+        method: 'POST',
+    }).then(result=>{
+        // 接收数据使用 result.data.键
+        details = result.data.details
+        // 在前端填充数据
+        full_showbox(details)
+    })
+    const get_back = document.querySelector('.back')
+    get_back.addEventListener('click',function(){
+      window.location.href = '{{ url_for('view_u.firstpage') }}'
+   })
+  </script>
+</body>
+</html>

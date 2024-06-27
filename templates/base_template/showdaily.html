@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>展示所有未到截止时间的未来日程</title>
+</head>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/showdaily.css') }}">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body>
+<button class="back">返回</button>
+  <div class="showdaily">
+    <div class="head">
+      <!-- 进行未来日程具体条目的展示 展示模式与设置时相一致-->
+      <button class="left"><</button>
+      <div class="showbox">
+        <h2>查看日常计划</h2>
+        <p>日程名</p>
+        <div class="base_info">
+            <p></p>
+        </div>
+        <p>日程具体条目</p>
+        <ul class="showdetail">
+        </ul>
+        <!-- 设置此日程是否还需提醒 -->
+
+        <div class="remind_change">是否再进行提醒<input type="checkbox" checked></div>
+      </div>
+     <button class="right">></button>
+    </div>
+    <ul class="tail">
+      <!-- 展示所有未完成的未来日程 按照距离截止时间的先后时间排序 -->
+    </ul>
+  </div>
+  <script>
+      const element_name = '<div class="name">条目名:</div>'
+      const element_type = '<div class="type">类型:</div>'
+      const element_tip = '<div class="tip">备注:</div>'
+      let current_id = 0
+      // 需要从后端获取的数据
+      let details = {}
+      let daily_plans = []
+      function change_type(id){
+          console.log(id+'对应的是'+daily_plans[id]['reminded'])
+          if(daily_plans[id]['reminded']){
+              // 当reminded为真 无需进行提醒
+              const change_content = document.querySelector(`.tail li:nth-child(${id+1}) div:nth-child(2)`)
+              change_content.innerHTML = '不再进行提醒'
+          }else{
+              // 当reminded为假 仍需要提醒 future_plans由remind字段指出相应的天数
+              const change_content = document.querySelector(`.tail li:nth-child(${id+1}) div:nth-child(2)`)
+              change_content.innerHTML = '今日提醒中'
+          }
+      }
+      function add_element(details){
+          // 用于填充展示部分的函数 此时的details是一个对象 存有计划名 和 具体条目
+          const add_name = document.querySelector('.base_info p')
+          // 填充内容
+          add_name.innerHTML += details['base_info']['name']
+          // 填充具体条目
+          let length = details['details'].length
+          for(let i = 0; i < length; i++){
+              const get_ul = document.querySelector('.showbox .showdetail')
+              get_ul.innerHTML += `
+              <li>
+                ${element_name}
+                ${element_type}
+                ${element_tip}
+              </li>
+              `
+              // 再对最新的条目进行赋值
+              const get_lis = document.querySelectorAll('.showbox .showdetail li')
+              let len_ul = get_lis.length
+              const get_name = document.querySelector(`.showbox .showdetail li:nth-child(${len_ul}) .name`)
+              const get_type = document.querySelector(`.showbox .showdetail li:nth-child(${len_ul}) .type`)
+              const get_tip = document.querySelector(`.showbox .showdetail li:nth-child(${len_ul}) .tip`)
+              get_name.innerHTML += details['details'][i]['name']
+              get_type.innerHTML += details['details'][i]['type']
+              get_tip.innerHTML += details['details'][i]['tip']
+          }
+          // 初始化复选框 需要获取到的元素为.remindchange
+          let input_element = ''
+          const change = document.querySelector('.remind_change')
+          if(details['base_info']['reminded']){
+              // 当值为真时 无需选中
+              input_element = `是否再进行提醒<input type="checkbox">`
+          }else{
+              input_element = `是否再进行提醒<input type="checkbox" checked>`
+          }
+          // 向div中填充内容
+          change.innerHTML = input_element
+          // 为checkbox添加点击事件 使之能够操作后台的reminded的值
+          const change_remind = document.querySelector('.remind_change input')
+          change_remind.addEventListener('click',function(){
+              // 获取到当前展示的计划的id
+              let plan_id = daily_plans[current_id]['id']
+              // 向后端传输数据以修改对应的reminded
+              axios({
+                  url:'{{ url_for('view_u.changedaily') }}',
+                  method:'POST',
+                  data:{
+                      plan_id:plan_id
+                  }
+              }).then(result=>{
+                  daily_plans[current_id]['reminded'] = result.data.flag
+                  change_type(current_id)
+              })
+          })
+      }
+
+      // 用于判断按钮可用性的函数
+      function change_use(id){
+        // 通过id的大小来设置按钮的可用性
+        const left_btn = document.querySelector('.left')
+        const right_btn = document.querySelector('.right')
+        if(id == 0){
+            // 说明当前为最左选中 左不可右可
+            left_btn.disabled = true
+            right_btn.disabled = false
+
+        }
+        else if(id == daily_plans.length-1){
+            left_btn.disabled = false
+            right_btn.disabled = true
+        }
+        else{
+            left_btn.disabled = false
+            right_btn.disabled = false
+        }
+    }
+    // 通过plan_id 查询plan相关信息的函数
+    function search_details(plan_id){
+        axios({
+            url:'{{ url_for('view_u.searchdaily') }}',
+            method:'POST',
+            data:{
+                id:plan_id
+            }
+        }).then(result=>{
+            // 后端会传一个details的对象
+            let change_details = result.data.details
+            let change_info = result.data.base_info
+            // 将两者组合成一个对象
+            let change_content = {'base_info':change_info,'details':change_details}
+            // 清空对应位置的所有元素
+            // 清除base_info部分
+            const name = document.querySelector('.base_info p')
+            name.innerHTML = ''
+            // 清除details部分
+            const get_ul = document.querySelector('.showdetail')
+            get_ul.innerHTML = ''
+            add_element(change_content) // 使用函数填充数据即可
+        })
+    }
+    // 用于改变盒子样式的函数
+     function change_active(id,pre){
+        // 获取盒子元素
+        const get_lis = document.querySelectorAll('.tail li')
+        const get_pre = get_lis[pre]
+        const get_now = get_lis[id]
+        // 将get_pre中的active样式转移到get_now内
+        get_pre.classList.remove('active')
+        get_now.classList.add('active')
+    }
+    // 用于初始化页面的axios的函数
+    axios({
+        url:'{{ url_for('view_u.showdaily') }}',
+        method:'POST'
+    }).then(result=>{
+        details = result.data.details
+        // plans为存放基本展示信息的数组
+        daily_plans = result.data.plans
+        // 初始化头部展示部分
+        add_element(details)
+        change_use(current_id)
+        // 通过plans初始化ul标签 初始没有任何li标签
+        const get_tail = document.querySelector('.tail')
+        for(let i = 0;i<daily_plans.length;i++){
+            // 同时加一个自定义的data-index的属性以辨别被点击的li标签
+            get_tail.innerHTML += `<li data-index=${i}>
+            <div>${daily_plans[i]['name']}</div>
+            <div>今日提醒中</div>
+            </li>`
+        }
+        // 最初的初始化完成之后 根据用户设置的提醒状态 对各个元素进行进一步的设置
+        for(let i = 0;i<daily_plans.length;i++){
+            change_type(i)
+        }
+        // 为第一个li标签添加样式
+        const get_tail_li = document.querySelector('.tail li')
+        get_tail_li.classList.add('active')
+        // 为li标签添加事件
+        const get_lis = document.querySelectorAll('.tail li')
+        for(let i = 0; i<get_lis.length;i++) {
+            get_lis[i].addEventListener('click', function (e) {
+                // 首先获取到所点击盒子的index 再通过index来获取到列表中对应日程的id
+                let index = e.target.dataset.index
+                // 修改样式
+                let pre_id = current_id
+                current_id = Number(index)
+                let plan_id = daily_plans[index]['id']
+                // 将id送往后端获取到对应的细节数目
+                search_details(plan_id)
+                change_use(current_id)
+                change_active(current_id,pre_id)
+            })
+        }
+    })
+
+    // 获取到左右按钮并添加事件
+    const left_btn = document.querySelector('.left')
+    const right_btn = document.querySelector('.right')
+    left_btn.addEventListener('click',function(e){
+        // 当按钮可用时才起效
+        if(e.target.disabled === false){
+            current_id -= 1
+            let plan_id = daily_plans[current_id]['id']
+            // 修改按钮可用性
+            change_use(current_id)
+            // 获取具体条目 并填充数据
+            search_details(plan_id)
+            // 修改样式
+            let pre_id = current_id + 1
+            change_active(current_id,pre_id)
+        }
+    })
+    right_btn.addEventListener('click',function(e){
+        // 当按钮可用时才起效
+        if(e.target.disabled === false){
+            current_id += 1
+            console.log(current_id)
+            console.log(daily_plans)
+            let plan_id = daily_plans[current_id]['id']
+            // 修改按钮可用性
+            change_use(current_id)
+            // 获取具体条目 并填充数据
+            search_details(plan_id)
+            // 修改样式
+            let pre_id = current_id - 1
+            change_active(current_id,pre_id)
+        }
+    })
+
+    const get_back = document.querySelector('.back')
+    get_back.addEventListener('click',function(){
+      window.location.href = '{{ url_for('view_u.firstpage') }}'
+    })
+  </script>
+</body>
+</html>

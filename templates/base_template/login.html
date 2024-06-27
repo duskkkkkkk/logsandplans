@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录模块</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/login.css') }}">
+</head>
+<body>
+<form class="login" action="{{ url_for('view_u.login') }}" method="POST">
+    <h2>用户登录</h2>
+    <p>用户名</p>
+    <input type="text" placeholder="请输入用户名" name="username">
+    <p>密码</p>
+    <input type="password" placeholder="请输入用户密码" name="password">
+    <div class="buttons">
+        <button type="submit">登录</button>
+        <button class="register">注册</button>
+    </div>
+</form>
+<script>
+    // 为注册按钮添加点击事件以进入注册页面
+    const get_register = document.querySelector('.buttons .register')
+    get_register.addEventListener('click',function(e){
+        e.preventDefault()
+        window.location.href = '{{ url_for('view_u.register') }}'
+    })
+</script>
+</body>
+</html>

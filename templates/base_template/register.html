@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册模块</title>
+</head>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/register.css') }}">
+<body>
+<form class="register" action="{{ url_for('view_u.register') }}" method="POST">
+    <h2>注册</h2>
+    <p>用户名</p><input type="text" placeholder="请输入用户名" name="username">
+    <p>手机号码</p><input type="text" placeholder="请输入手机号" name="phone">
+    <p>密码</p><input type="password" placeholder="请输入密码" name="password">
+    <p>确认密码</p><input type="password" placeholder="请确认密码" name="confirm">
+    <button type="submit">注册</button>
+</form>
+</body>
+</html>

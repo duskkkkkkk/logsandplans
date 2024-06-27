@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>未来行程的设定</title>
+</head>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/setfuture.css') }}">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body>
+<button class="back">返回</button>
+<div class="setfuture">
+    <div class="items set">
+        <h2>设定未来的日程以防遗忘吧</h2>
+        <p>设定日程基本信息</p>
+        <div class="input_general">
+            <input type="text" class="input_name" placeholder="输入日程名">
+            <input type="text" class="input_ddl" placeholder="输入日程截止时间">
+            <input type="text" class="input_remind" placeholder="希望系统几天前提醒">
+        </div>
+        <p>设定日程具体条目</p>
+        <ul class="input_area">
+            <li>
+                <input type="text" placeholder="请输入条目名称" name="plan_name" value="">
+                <input type="text" placeholder="请设定类型" name="plan_type" value="">
+                <textarea class="getcontent" placeholder="添加相关备注" maxlength="200" ></textarea>
+            </li>
+        </ul>
+        <button class="add" title="点击添加日程条目">+</button>
+        <button class="submit">确认设定</button>
+    </div>
+</div>
+<script>
+        // 通过点击li标签内的+按钮来向输入li中添加元素
+        // 获取元素
+        function check_change(results){
+            // 用来检测results中的值与此时元素中的值是否一致 若不一致则修改
+            const get_lis = document.querySelectorAll('.set .input_area li')
+            const length = results.length
+            for(let i = 0;i < length; i++){
+                const get_name = document.querySelector(`.set .input_area li:nth-child(${i+1}) input:nth-child(1)`)
+                const get_type = document.querySelector(`.set .input_area li:nth-child(${i+1}) input:nth-child(2)`)
+                const get_tip = document.querySelector(`.set .input_area li:nth-child(${i+1}) textarea`)
+                // 直接将新的值赋给result即可
+                results[i]['name'] = get_name.value
+                results[i]['type'] = get_type.value
+                results[i]['tip'] = get_tip.value
+            }
+        }
+        const add_btn = document.querySelector('.setfuture .add')
+        const set_ul = document.querySelector('.setfuture ul')
+        let results = [] // 存放已有结果的数组
+        const input_name = '<input type="text" placeholder="请输入条目名称" name="plan_name" value="">'
+        const input_type = '<input type="text" placeholder="请设定类型" name="plan_type" value="">'
+        const input_tip = '<textarea class="getcontent" placeholder="添加相关备注" maxlength="200" ></textarea>'
+        // 为添加按钮增添点击事件
+        add_btn.addEventListener('click',function(){
+            // 选择input标签时一定要注意使用属性选择器
+            // 获取到最新一条输入的各元素
+            check_change(results)
+            let get_lis = document.querySelectorAll('.set .input_area li')
+            let length = get_lis.length
+            let get_name = document.querySelector(`.set .input_area li:nth-child(${length}) input:nth-child(1)`)
+            let get_type = document.querySelector(`.set .input_area li:nth-child(${length}) input:nth-child(2)`)
+            let get_tip = document.querySelector(`.set .input_area li:nth-child(${length}) textarea`)
+            let tip_content = ''
+            if(get_tip.value){
+                tip_content = get_tip.value
+            }else{
+                tip_content = '无'
+            }
+            let result = {'name':get_name.value,'type':get_type.value,'tip':tip_content}
+            results[length-1] = result // 向结果数组中添加条目对象
+            console.log(results)
+            set_ul.innerHTML +=
+            `<li>
+                ${input_name}
+                ${input_type}
+                ${input_tip}
+            </li>`
+            for( let i = 0 ; i < results.length; i++){
+                // 为li标签中的input的value逐个赋值
+               let get_name = document.querySelector(`.set .input_area li:nth-child(${i+1}) input:nth-child(1)`)
+               let get_type = document.querySelector(`.set .input_area li:nth-child(${i+1}) input:nth-child(2)`)
+               let get_tip = document.querySelector(`.set .input_area li:nth-child(${i+1}) textarea`)
+               get_name.value = results[i]['name']
+               get_type.value = results[i]['type']
+               get_tip.value = results[i]['tip']
+            }
+        })
+        // 获取到确认设定的按钮
+        const submit_btn = document.querySelector('.set .submit')
+
+        // 为按钮添加点击事件
+        submit_btn.addEventListener('click',function(){
+            // 这个只需要管将results传到后端
+            // 注:此时并未将设定的最后一个条目传入results中 在此额外获取
+            let get_lis = document.querySelectorAll('.set .input_area li')
+            let length = get_lis.length
+            let get_name = document.querySelector(`.set .input_area li:nth-child(${length}) input:nth-child(1)`)
+            let get_type = document.querySelector(`.set .input_area li:nth-child(${length}) input:nth-child(2)`)
+            let get_tip = document.querySelector(`.set .input_area li:nth-child(${length}) textarea`)
+            let tip_content = ''
+            if(get_tip.value){
+                tip_content = get_tip.value
+            }else{
+                tip_content = '无'
+            }
+            let result = {'name':get_name.value,'type':get_type.value,'tip':tip_content}
+            results[length-1] = result // 向结果数组中添加条目对象
+            console.log(results)
+            // 获取到日程的基本信息 包括日程名 截止时间 提醒时间
+            const get_base_name = document.querySelector('.set .input_general .input_name')
+            const get_base_ddl = document.querySelector('.set .input_general .input_ddl')
+            const get_base_remind = document.querySelector('.set .input_general .input_remind')
+            base_info = {'name':get_base_name.value,'ddl':get_base_ddl.value,'remind':get_base_remind.value}
+            console.log(base_info)
+            axios({
+                url:'{{ url_for('view_u.setfuture') }}',
+                method: 'POST',
+                data:{
+                    results: results,
+                    base_info: base_info
+                }
+            }).then(result=>{
+                console.log('提交成功')
+                // 加一个跳到别的页面的函数
+            })
+            })
+
+        const get_back = document.querySelector('.back')
+        get_back.addEventListener('click',function(){
+        window.location.href = '{{ url_for('view_u.firstpage') }}'
+        })
+    </script>
+</body>
+</html>

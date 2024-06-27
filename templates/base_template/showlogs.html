@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>展示所有未到截止时间的未来日程</title>
+</head>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/showlogs.css') }}">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body>
+<button class="back">返回</button>
+  <div class="showlog">
+    <div class="head">
+      <!-- 进行未来日程具体条目的展示 展示模式与设置时相一致-->
+      <button class="left"><</button>
+      <div class="showbox">
+        <h2>查看日志详情</h2>
+        <p>标题</p>
+        <div class="base_info">
+            <p></p>
+        </div>
+        <p>正文</p>
+        <div class="content"></div>
+        <!-- 设置此日程是否还需提醒 -->
+      </div>
+      <div class="pic">
+        <ul>
+
+        </ul>
+      </div>
+     <button class="right">></button>
+    </div>
+    <div class="createlog">
+      <h2>创建日志</h2>
+      <form  action="{{ url_for('view_u.createlog') }}" method="POST" enctype="multipart/form-data">
+          <input type="text" placeholder="请输入日志标题" class="inputname" name="name">
+          <textarea placeholder="请输入日志内容" name="content"></textarea>
+          <div>上传相关图片信息<input type="file" multiple="multiple" class="inputpic" name="file"></div>
+          <button type="submit">创建日志</button>
+      </form>
+
+    </div>
+    <ul class="tail">
+      <!-- 展示所有未完成的未来日程 按照距离截止时间的先后时间排序 -->
+    </ul>
+  </div>
+  <script>
+    let details = []
+    let uid = 0
+    let current_id = 0
+    // 修改active样式的函数 需传入当前样式所在的下标以及之前样式所在的下标
+    function change_active(current,pre){
+        const get_now = document.querySelector(`.tail li:nth-child(${current+1})`)
+        const get_pre = document.querySelector(`.tail li:nth-child(${pre+1})`)
+        get_now.classList.add('active')
+        get_pre.classList.remove('active')
+    }
+    // 填充头部部分的函数newdetails 为对象 有id 名字 内容 focus 创建时间 以及对应的图片 图片也同样是列表 其中此处仅需使用title 正文 以及图片
+    function full_showbox(new_details){
+          // 填充标题
+          const add_name = document.querySelector('.base_info p')
+          add_name.innerHTML = new_details['name']
+          // 填充正文
+          const add_content = document.querySelector('.showbox .content')
+          add_content.innerHTML = new_details['content']
+          // 填充右侧图片
+          const get_ul = document.querySelector('.pic ul')
+          get_ul.innerHTML = ''
+          for(let i = 0; i< new_details['pic'].length; i++){
+              get_ul.innerHTML += '<li><img></li>'
+              // 获取到最新添加的li标签 并修改其背景图片样式
+              let length = document.querySelectorAll('.pic ul li').length
+              const get_img = document.querySelector(`.pic ul li:nth-child(${length}) img`)
+              // 注意这里图片路径不传相对路径 直接传递绝对路径
+              // get_newli.style.backgroundImage = new_details['pic'][i]
+              get_img.src = '{{ url_for('static',filename='uploads/') }}'+String(uid)+'/'+new_details['pic'][i]
+          }
+    }
+    // 这里的newdetails 是 一个列表 其内的每个元素需包含日志的基本信息 此处所需的信息为id 标题 创建日期 focus
+    function full_tail(new_details){
+        // 首先渲染各个日志
+        const get_tail = document.querySelector('.tail')
+        for(let i = 0; i<new_details.length;i++){
+            get_tail.innerHTML += `<li data-index=${i}>
+                <img data-index=${i}>
+                <div>标题:${new_details[i]['name']}</div>
+                <div>创建时间:<br>${new_details[i]['create']}</div>
+                </li>`
+        }
+
+        // 初始化头部区域 默认是使用第一个日志的内容进行初始化
+        if(new_details.length){
+            full_showbox(details[0])
+            // 同时为首个li添加样式
+            const get_first = document.querySelector('.tail li:nth-child(1)')
+            get_first.classList.add('active')
+        }
+        // 根据各个日志的focus状态初始化图标的样子
+        // 为达成focus的日志优先显示的效果 则在后端传递数据时需要将focus的数据向前排
+        for(let i = 0; i<new_details.length;i++){
+            // 获取图片元素
+            const get_img = document.querySelector(`.tail li:nth-child(${i+1}) img`)
+            if(new_details[i]['focus']){
+                get_img.src = '{{ url_for('static',filename='images/focus.svg') }}'
+            }else{
+                get_img.src = '{{ url_for('static',filename='images/unfocus.svg') }}'
+            }
+        }
+        // 向ul的尾部追加带有add类的li标签 作为创建日志的接口
+        get_tail.innerHTML += `<li class="add">+</li>`
+
+    }
+    function add_events(new_details){
+        // 为tail内的各个li标签添加事件
+        for(let i = 0; i<new_details.length;i++){
+            const get_li = document.querySelector(`.tail li:nth-child(${i+1})`)
+            console.log('运行了')
+            console.log(get_li)
+            get_li.addEventListener('click',function(e){
+                // 向头部填充对应的信息
+                let index = Number(e.target.dataset.index)
+                let pre_index = current_id
+                current_id = index
+                full_showbox(details[index])
+                // 修改active样式以及current_id
+                change_active(current_id,pre_index)
+            })
+        }
+        for(let i = 0; i<new_details.length;i++){
+            // 获取图片元素
+            const get_img = document.querySelector(`.tail li:nth-child(${i+1}) img`)
+            // 修改样式之后为每个图标添加focus事件
+            get_img.addEventListener('click',function(e){
+                // 阻止事件冒泡
+                e.stopImmediatePropagation()
+                // 将所点击的盒子中的index属性传递到后端
+                let index = Number(e.target.dataset.index)
+                let log_id = details[index]['id']
+                axios({
+                    url:'{{ url_for('view_u.setfocus') }}',
+                    method:'POST',
+                    data:{
+                        log_id: log_id
+                    }
+                }).then(result=>{
+                    details = result.data.details
+                    // 后端需额外传递当前盒子所在的数组内的下标
+                    let new_index = result.data.index
+                    let pre_index = current_id
+                    current_id = Number(new_index)
+                    // 重新填充页面内容 重新填充下方即可
+                    // 首先得清空尾部的内容
+                    const get_newtail = document.querySelector('.tail')
+                    get_newtail.innerHTML = ''
+                    full_tail(details)
+                    add_events(details)
+                    full_showbox(details[current_id])
+                    // 保持样式在当前盒子
+                    change_active(current_id,pre_index)
+                })
+            })
+        }
+        // 为add添加事件 点击修改当前页面为添加页面的界面
+        const get_add = document.querySelector('.tail .add')
+        get_add.addEventListener('click',function(){
+             const get_head = document.querySelector('.head')
+             const get_create = document.querySelector('.createlog')
+             get_head.style.display = 'none'
+             get_create.style.display = 'block'
+        })
+    }
+    // 修改按钮可用性的函数
+    function change_use(id){
+        // 通过id的大小来设置按钮的可用性
+        const left_btn = document.querySelector('.left')
+        const right_btn = document.querySelector('.right')
+        if(id == 0){
+            // 说明当前为最左选中 左不可右可
+            left_btn.disabled = true
+            right_btn.disabled = false
+
+        }
+        else if(id == details.length-1){
+            left_btn.disabled = false
+            right_btn.disabled = true
+        }
+        else{
+            left_btn.disabled = false
+            right_btn.disabled = false
+        }
+    }
+    // 初始化页面的函数
+    axios({
+        url:'{{ url_for('view_u.showcontent') }}',
+        method:'POST'
+    }).then(result=>{
+        details = result.data.details
+        uid = result.data.uid
+        // 同时填充上方函数以及下方函数
+        full_tail(details)
+        add_events(details)
+    })
+    // 为按钮添加事件
+    const left_btn = document.querySelector('.left')
+    const right_btn = document.querySelector('.right')
+    left_btn.addEventListener('click',function(e){
+        // 当按钮可用时才起效
+        if(e.target.disabled === false){
+            current_id -= 1
+            // 修改按钮可用性
+            change_use(current_id)
+            full_showbox(details[current_id])
+            // 修改样式
+            let pre_id = current_id + 1
+            change_active(current_id,pre_id)
+        }
+    })
+    right_btn.addEventListener('click',function(e){
+        // 当按钮可用时才起效
+        if(e.target.disabled === false){
+            current_id += 1
+            // 修改按钮可用性
+            change_use(current_id)
+            full_showbox(details[current_id])
+            // 修改样式
+            let pre_id = current_id - 1
+            change_active(current_id,pre_id)
+        }
+    })
+    const get_back = document.querySelector('.back')
+    get_back.addEventListener('click',function(){
+      window.location.href = '{{ url_for('view_u.showset') }}'
+    })
+  </script>
+</body>
+</html>

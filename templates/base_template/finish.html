@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设置今日计划的完成情况</title>
+</head>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/finish.css') }}">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body>
+<button class="back">返回</button>
+<div class="changetoday">
+  <h2>来完成制定的计划吧</h2>
+  <table>
+    <thead>
+      <tr>
+        <td>计划名</td>
+        <td>计划类型</td>
+        <td>优先级</td>
+        <td>完成情况</td>
+      </tr>
+    </thead>
+  </table>
+  <ul class="showbox">
+  </ul>
+</div>
+<script>
+  // 从后端获取数据 用以填充计划展示表 注:后端传来的数据应当是提前就排好的
+  let details = []
+  const element_id = '<div class="hide"></div>'
+  const element_name = '<div class="showname show"></div>'
+  const element_type = '<div class="showtype show"></div>'
+  const element_priority  = '<div class="showprio show"></div>'
+  let element_input = ''
+  axios({
+      url:'{{ url_for('view_u.get_details') }}',
+      method:'POST'
+  }).then(result=>{
+      // 后端在接收到信息之后传一个带details的json字符串 json字符串内为计划条目的对象
+      details = result.data.details
+      console.log(details)
+      // 填充计划展示表
+      for(let i = 0; i<details.length;i++){
+              // 若非首条数据 则需先添加标签元素再填充
+              if(details[i]['finished']){
+                  element_input = '<input type="checkbox" data-index="" checked>'
+              }else{
+                  element_input = '<input type="checkbox" data-index="">'
+              }
+              const get_showbox = document.querySelector('.showbox')
+              get_showbox.innerHTML += `
+                <li>
+                ${element_id}
+                ${element_name}
+                ${element_type}
+                ${element_priority}
+                ${element_input}
+                </li>`
+              const get_lis = document.querySelectorAll('.showbox li')
+              let length = get_lis.length
+              // 对所有li标签内的最新一条进行赋值
+              const input_id = document.querySelector(`.changetoday .showbox li:nth-child(${length}) .hide`)
+              const input_name = document.querySelector(`.changetoday .showbox li:nth-child(${length}) .showname`)
+              const input_type = document.querySelector(`.changetoday .showbox li:nth-child(${length}) .showtype`)
+              const input_priority = document.querySelector(`.changetoday .showbox li:nth-child(${length}) .showprio`)
+              const input_check = document.querySelector(`.changetoday .showbox li:nth-child(${length}) input[type='checkbox']`)
+              input_id.innerHTML = details[i]['id']
+              input_name.innerHTML = details[i]['name']
+              input_type.innerHTML = details[i]['type']
+              input_priority.innerHTML = details[i]['priority']
+              // 为checkbox添加索引
+              input_check.dataset.index = i+1
+
+      }// 循环结束赋值结束
+      // 为复选框添加事件 点击复选框时向后端传输数据将对应的数据完成情况修改为true
+  // 如何判断点击的是哪一个复选框 可为添加一个自定义的属性用以指出input所处的位置
+  const get_input = document.querySelectorAll('.changetoday .showbox li input[type="checkbox"]')
+  // 为input添加事件
+  for(let i = 0; i<get_input.length;i++){
+      get_input[i].addEventListener('click',function(e){
+          // e表示事件对象 事件对象内的target属性会指出受到当前事件影响的元素
+          console.log(e.target)
+          let index = e.target.dataset.index
+          let flag = e.target.checked
+          // 获取到对应位置的其他元素
+          const input_id = document.querySelector(`.changetoday .showbox li:nth-child(${index}) .hide`)
+          // 获取元素内的信息
+          let detail_id = input_id.innerHTML
+          // 将此信息传给后端进行相应的修改
+          axios({
+              url:'{{ url_for('view_u.change_finish') }}',
+              method:'POST',
+              data: {
+                  detail_id: detail_id,
+                  finished: flag
+              }
+          }).then(result=>{
+              console.log(result.data.msg)
+          })
+      })
+  }
+  })
+  // 为返回按钮添加事件
+  const get_back = document.querySelector('.back')
+  get_back.addEventListener('click',function(){
+      window.location.href = '{{ url_for('view_u.firstpage') }}'
+  })
+</script>
+</body>
+</html>
