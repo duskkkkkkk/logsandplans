@@ -1,0 +1,53 @@
+.login {
+        margin: 50px auto;
+        padding-top: 20px;
+        width: 500px;
+        height: 300px;
+        border-radius: 5px;
+        background-color: #cae1fa;
+    }
+    .login h2 {
+      display: block;
+      margin-bottom: 5px;
+      width: 500px;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+    }
+    .login p {
+      display: block;
+      margin-top: 5px;
+      margin-bottom: 4px;
+      padding-left: 122px;
+      width: 500px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    input {
+        display: block;
+        margin: 0px auto;
+        padding-left: 10px;
+        width: 240px;
+        height: 36px;
+        border: 2px solid rgb(62, 174, 234);
+        border-radius: 5px;
+        line-height: 36px;
+        outline: none;
+    }
+    .buttons {
+      display: flex;
+      margin: 20px auto;
+      justify-content: space-around;
+      width: 380px;
+      height: 40px;
+    }
+    button {
+        display:block;
+        width: 64px;
+        height: 30px;
+        border: none;
+        border-radius: 5px;
+        background-color: rgb(46, 156, 235);
+        color: white;
+        cursor: pointer;
+    }

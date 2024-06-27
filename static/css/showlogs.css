@@ -1,0 +1,215 @@
+* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    li {
+        list-style: none;
+    }
+    /* 头部展示部分样式 */
+    .head {
+      display: flex;
+      justify-content: center;
+    }
+    .left,
+    .right {
+      display: block;
+      align-self: center;
+      margin-right: 12px;
+      margin-left: 12px;
+      width: 40px;
+      height: 80px;
+      appearance: none;
+      border:none;
+      background-color: rgba(19, 102, 217, 0.752);
+      color:white;
+      font-size: 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .left {
+      justify-self: flex-end;
+      margin-top: 4px;
+    }
+    .showbox,
+    .createlog {
+        margin-top: 20px;
+        padding: 4px;
+        overflow: auto;
+        width:620px;
+        height: 520px;
+        border: skyblue solid 2px;
+        border-radius: 5px;
+        background-color: skyblue;
+    }
+    .createlog {
+      display: none;
+      margin: 20px auto;
+    }
+    .createlog .inputname {
+      display: block;
+      margin: 15px auto;
+      padding: 8px;
+      width: 580px;
+      height: 40px;
+      line-height: 40px;
+      border: #30799B solid 2px;
+      border-radius: 5px;
+      outline: none;
+    }
+    .createlog textarea {
+      display: block;
+      margin: 15px auto;
+      padding: 8px;
+      width: 580px;
+      height: 400px;
+      border: #30799B solid 2px;
+      border-radius: 5px;
+      outline: none;
+      white-space: pre-wrap;
+      resize: none;
+      overflow: auto;
+    }
+    .createlog div {
+      margin: 0 auto;
+      padding-left: 8px;
+      font-size: 14px;
+    }
+    .createlog button {
+      display: block;
+      margin: 5px auto;
+      margin-top: 10px;
+      align-self: flex-end;
+      width: 160px;
+      height: 30px;
+      background-color: #30799B;
+      border: none;
+      border-radius: 30px;
+      color: white;
+      font-size: 16px;
+      text-align: center;
+      line-height: 30px;
+      cursor: pointer;
+    }
+    .showbox h2,
+    .createlog h2{
+       display: block;
+       margin-bottom: 10px;
+       text-align: center;
+    }
+    .showbox>p {
+      display: block;
+      margin-left: 5px;
+    }
+    .showbox .base_info {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 5px auto;
+      align-items: center;
+      justify-content: space-evenly;
+      width: 580px;
+      height: 40px;
+      border: #30799B solid 2px;
+      border-radius: 5px;
+      background-color: #fff;
+    }
+    .base_info p {
+      display: block;
+      padding-left: 14px;
+      width: 580px;
+      height: 18px;
+    }
+    .content {
+      margin: 5px auto;
+      padding: 6px 6px;
+      width: 580px;
+      height: 400px;
+      border: #30799B solid 2px;
+      background-color: #fff;
+      border-radius: 5px;
+    }
+    .pic {
+      margin-top: 20px;
+      margin-left: 8px;
+      width: 300px;
+      height: 500px;
+      border: #30799B solid 2px;
+      border-radius: 5px;
+      background-color: skyblue;
+      overflow: auto;
+    }
+
+    .pic li {
+      margin: 10px auto;
+      width: 240px;
+      height: 180px;
+      background-color: white;
+      border: #30799B solid 2px;
+      border-radius: 5px;
+      background-size: cover;
+    }
+    .pic li img {
+        width: 240px;
+        height: 180px;
+    }
+  /* 底部选择部分样式 */
+  .tail {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    margin: 30px 50px;
+    padding: 0 20px;
+    height: 200px;
+    border: solid rgb(73, 75, 224) 2px;
+    border-radius: 10px;
+    overflow-x: auto;
+  }
+  .tail li {
+    flex: none;
+    margin:0 10px;
+    padding-top: 2px;
+    height: 170px;
+    width: 140px;
+    background-color:rgba(50, 151, 218, 0.752);
+    border-radius: 5px;
+    font-size:14px;
+    text-align: center;
+    line-height: 28px;
+    /* color: rgb(25, 213, 85); */
+    cursor: pointer;
+  }
+  .tail li div {
+      pointer-events: none;
+  }
+  .tail li img {
+    width: 24px;
+    cursor: pointer;
+  }
+  .tail li:hover {
+    margin-right: 5px;
+    padding-top: 8px;
+    width: 160px;
+    height: 180px;
+    font-size: 16px;
+  }
+  .tail .add {
+    font-size: 40px;
+    line-height: 150px;
+  }
+  .tail .add:hover {
+    font-size: 40px;
+  }
+  .active {
+    border: solid rgb(228, 170, 23) 2px;
+  }
+  .back {
+      display:block;
+      margin: 5px 5px;
+      width: 80px;
+      height: 36px;
+      border: none;
+      border-radius: 5px;
+      background-color: rgb(46, 156, 235);
+      color: white;
+      cursor: pointer;
+    }

@@ -1,0 +1,170 @@
+* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    li {
+        list-style: none;
+    }
+    /* 首页样式 */
+    .firstpage {
+      margin: 30px auto;
+      width: 1200px;
+      height: 680px;
+      background-color: #cef2fe;
+      border-radius: 5px;
+    }
+    /* 用户信息展示 */
+    .base_info {
+      display: flex;
+      width: 1200px;
+      height: 140px;
+      border: 2px solid rgb(76, 172, 224);
+      border-radius: 5px;
+      background-color: #fff;
+    }
+    .base_info .icon {
+      margin-left: 12px;
+      margin-top: 8px;
+      width: 120px;
+      height: 120px;
+      border: 2px solid rgb(76, 172, 224);
+      border-radius: 50%;
+    }
+    .base_info .login {
+      margin-top: 8px;
+      margin-left: 12px;
+      padding-top: 8px;
+      width: 200px;
+      height: 120px;
+    }
+    .login .username,
+    .login .time {
+      margin-bottom: 8px;
+      padding-left: 10px;
+      width: 200px;
+      height: 30px;
+      color: #2b96d4;
+      font-weight: bold;
+    }
+    .login .username {
+      font-size: 18px;
+    }
+
+    .base_info .logout {
+      margin-top: 40px;
+      margin-left: 750px;
+      width: 80px;
+      height: 40px;
+      border-radius: 5px;
+      background-color: #28b5e0;
+      line-height: 40px;
+      text-align: center;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+    }
+    /* alert部分 */
+    .alert {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      width: 1200px;
+      height: 160px;
+    }
+    .alert .futuredetail,
+    .alert .dailydetail {
+        padding-top: 50px;
+        width: 340px;
+        height: 120px;
+        border-radius: 8px;
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        color: white;
+    }
+    .todaydetail {
+      padding-top: 20px;
+      width: 340px;
+        height: 120px;
+        border-radius: 8px;
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        color: white;
+      background-color: rgb(36, 215, 177);
+    }
+    .futuredetail {
+      background-color: #31adeb;
+    }
+    .dailydetail {
+      background-color: #f59416;
+    }
+    /* 创建计划部分 */
+    .addnew {
+      display: flex;
+      justify-content: space-around;
+      width: 1200px;
+      height: 50px;
+    }
+    .addnew li {
+      width: 340px;
+      height: 50px;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 50px;
+      color: white;
+      cursor: pointer;
+    }
+    .addtoday {
+      background-color: rgb(36, 215, 177);
+    }
+    .addfuture {
+      background-color: #31adeb;
+    }
+    .adddaily {
+      background-color: #f59416;
+    }
+    /* 交互跳转部分 */
+    .jump {
+      margin: 40px auto;
+      display: flex;
+      justify-content: center;
+      width: 1000px;
+      height: 240px;
+    }
+
+    .jump li {
+      width: 180px;
+      height: 180px;
+      line-height: 180px;
+      text-align: center;
+      font-size: 22px;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+    }
+    .jump .future,
+    .jump .logset {
+      margin-top: 60px;
+    }
+    /* 设置按钮颜色 */
+    .jump .future {
+      background-color: #31adeb;
+      border: 1px solid #31adeb;
+    }
+    .jump .daily {
+      background-color: #f59416;
+      border: 1px solid #f59416;
+    }
+    .jump .today {
+      background-color: rgb(36, 215, 177);
+      border: 1px solid rgb(36, 215, 177);
+    }
+    .jump .logset {
+      background-color: #ff75ca;
+      border: 1px solid #ff75ca;
+    }

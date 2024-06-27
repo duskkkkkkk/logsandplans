@@ -1,0 +1,110 @@
+* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    li {
+        list-style: none;
+    }
+    .settoday {
+        display:flex;
+        justify-content: center;
+        align-items: flex-start;
+        margin: 20px auto;
+        padding: 4px;
+        overflow: auto;
+        width:400px;
+        height: 500px;
+        border: skyblue solid 2px;
+        border-radius: 5px;
+    }
+    .settoday h2 {
+       text-align: center;
+    }
+    .settoday td {
+        width: 118px;
+        height: 30px;
+        border-bottom: black dashed 2px;
+        text-align: center;
+        line-height: 30px;
+    }
+    .settoday .change {
+        align-self: center;
+    }
+    .settoday .set {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .settoday .change button {
+        border: none;
+        width: 200px;
+        height: 80px;
+        background-color: #3199c9;
+        border-radius: 40px;
+        font-size: 20px;
+        color: black;
+        text-align: center;
+        line-height: 50px;
+        cursor: pointer;
+    }
+    .settoday .items {
+      display: none;
+    }
+    .set li {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 4px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        width: 360px;
+        height: 50px;
+        border: #30799B solid 2px;
+        border-radius: 5px;
+    }
+    .settoday li input {
+        width: 110px;
+        height: 30px;
+        border: none;
+        border: #30799B solid 1px;
+        border-radius: 5px;
+        outline: none;
+    }
+    .settoday .add {
+        width: 290px;
+        height: 40px;
+        border: none;
+        background-color: white;
+        font-size: 20px;
+        text-align: center;
+        line-height: 40px;
+        cursor: pointer
+    }
+    .set .submit {
+        align-self: flex-end;
+        width: 200px;
+        height: 60px;
+        background-color: #30799B;
+        border: none;
+        border-radius: 30px;
+        color: white;
+        font-size: 16px;
+        text-align: center;
+        line-height: 60px;
+        cursor: pointer;
+    }
+    .items.active {
+      /* 只有拥有active类的样式才能够正常显示  还是得搞清楚这种items.active选的到底是什么类 这个应该是交集选择器 同时满足才可以*/
+      display: flex;
+    }
+    .back {
+      display:block;
+      margin: 5px 5px;
+      width: 80px;
+      height: 36px;
+      border: none;
+      border-radius: 5px;
+      background-color: rgb(46, 156, 235);
+      color: white;
+      cursor: pointer;
+    }

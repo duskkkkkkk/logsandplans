@@ -1,0 +1,118 @@
+* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    li {
+        list-style: none;
+    }
+    .setdaily {
+        display:flex;
+        justify-content: center;
+        align-items: flex-start;
+        margin: 20px auto;
+        padding: 4px;
+        overflow: auto;
+        width:600px;
+        height: 500px;
+        border: skyblue solid 2px;
+        border-radius: 5px;
+        background-color: rgba(135, 207, 235, 0.911);
+    }
+    .setdaily h2 {
+       text-align: center;
+    }
+    .items>p {
+        margin-top: 10px;
+        color: black;
+    }
+    .input_name {
+        padding-left: 5px;
+        margin: 10px auto;
+        width: 540px;
+        height: 35px;
+        outline: none;
+        border: #30799B solid 2px;
+        border-radius: 5px;
+    }
+    .setdaily .set {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .set li {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 4px;
+        margin: 20px auto;
+        width: 540px;
+        height: 110px;
+        border: #30799B solid 2px;
+        border-radius: 5px;
+        background-color: #fff;
+    }
+    .setdaily li input {
+        padding-left: 4px;
+        margin-left: 14px;
+        width: 170px;
+        height: 35px;
+        border: #30799B solid 1px;
+        border-radius: 5px;
+        outline: none;
+    }
+    .setdaily .add {
+        display: block;
+        margin: 9px auto;
+        width: 540px;
+        height: 40px;
+        border: #30799B solid 2px;
+        border-radius: 5px;
+        background-color: white;
+        font-size: 20px;
+        text-align: center;
+        line-height: 40px;
+        cursor: pointer
+    }
+    .set .submit {
+        display: block;
+        margin: 5px auto;
+        margin-top: 10px;
+        align-self: flex-end;
+        width: 200px;
+        height: 60px;
+        background-color: #30799B;
+        border: none;
+        border-radius: 30px;
+        color: white;
+        font-size: 16px;
+        text-align: center;
+        line-height: 60px;
+        cursor: pointer;
+    }
+    .getcontent {
+    /* 设计输入框的样式 */
+    padding: 6px;
+    margin: 0 auto;
+    width: 500px;
+    height: 40px;
+    outline: none;
+    border: solid #30799B 1px;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 24px;
+    /* 实现文本框自动换行的样式 */
+    white-space: pre-wrap;
+    /* 让用户无法调整文本域的大小 */
+    resize: none;
+   }
+   .back {
+      display:block;
+      margin: 5px 5px;
+      width: 80px;
+      height: 36px;
+      border: none;
+      border-radius: 5px;
+      background-color: rgb(46, 156, 235);
+      color: white;
+      cursor: pointer;
+    }

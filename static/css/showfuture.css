@@ -1,0 +1,192 @@
+* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    li {
+        list-style: none;
+    }
+    /* 头部展示部分样式 */
+    .head {
+      display: flex;
+      justify-content: center;
+    }
+    .head .remind_change {
+      display:flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding-right: 10px;
+      height: 22px;
+      font-size: 16px;
+    }
+    .remind_change input {
+      margin-left: 5px;
+      width: 15px;
+      height: 15px;
+    }
+    .left,
+    .right {
+      display: block;
+      align-self: center;
+      margin-right: 12px;
+      margin-left: 12px;
+      width: 40px;
+      height: 80px;
+      appearance: none;
+      border:none;
+      background-color: rgba(19, 102, 217, 0.752);
+      color:white;
+      font-size: 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .left {
+      justify-self: flex-end;
+      margin-top: 4px;
+    }
+    .showbox {
+        /* display:flex;
+        justify-content: center;
+        align-items: flex-start;
+        flex-wrap: wrap; */
+        margin-top: 20px;
+        padding: 4px;
+        overflow: auto;
+        width:620px;
+        height: 500px;
+        border: skyblue solid 2px;
+        border-radius: 5px;
+        background-color: skyblue;
+    }
+    .showbox h2 {
+       display: block;
+       margin-bottom: 10px;
+       text-align: center;
+    }
+    .showbox>p {
+      display: block;
+      margin-left: 5px;
+    }
+    .showbox .base_info {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 5px auto;
+      align-items: center;
+      justify-content: space-evenly;
+      width: 580px;
+      height: 140px;
+      border: #30799B solid 2px;
+      border-radius: 5px;
+      background-color: #fff;
+    }
+    .base_info p {
+      display: block;
+      padding-left: 14px;
+      width: 580px;
+      height: 18px;
+    }
+    .base_info ul{
+      margin-bottom: 10px;
+      width: 270px;
+      height: 80px;
+      border: #30799B solid 2px;
+      border-radius: 5px;
+      background-color: #fff;
+    }
+    .showbox li {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 4px;
+        margin: 10px auto;
+        width: 580px;
+        height: 100px;
+        border: #30799B solid 2px;
+        border-radius: 5px;
+        background-color: #fff;
+    }
+    .showbox .base_info li {
+      margin: 6px auto;
+      width: 240px;
+      height: 30px;
+      border: none;
+      background-color: #fff;
+    }
+    .showbox .name,
+    .showbox .type {
+      margin-left: 14px;
+      margin-top: 5px;
+      margin-bottom: 5px;
+      padding-left: 5px;
+      border: #30799B solid 1px;
+      border-radius: 5px;
+      width: 250px;
+      height: 32px;
+      line-height: 32px;
+      font-size: 14px;
+      color: rgb(46, 40, 40);
+    }
+    .showbox .type {
+      margin-left: 40px;
+    }
+    .showbox .tip {
+      margin: 5px auto;
+      padding-left: 5px;
+      border: #30799B solid 1px;
+      border-radius: 5px;
+      width: 540px;
+      height: 32px;
+      line-height: 32px;
+      font-size: 14px;
+      color: rgb(46, 40, 40);
+    }
+  /* 底部选择部分样式 */
+  .tail {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    margin: 30px 50px;
+    padding: 0 20px;
+    height: 200px;
+    border: solid rgb(73, 75, 224) 2px;
+    border-radius: 10px;
+    overflow-x: auto;
+  }
+  .tail li {
+    flex: none;
+    margin:0 10px;
+    padding-top: 2px;
+    height: 170px;
+    width: 140px;
+    background-color:rgba(50, 151, 218, 0.752);
+    border-radius: 5px;
+    font-size:14px;
+    text-align: center;
+    line-height: 28px;
+    /* color: rgb(25, 213, 85); */
+    cursor: pointer;
+  }
+  .tail li div {
+      pointer-events: none;
+  }
+  .tail li:hover {
+    margin-right: 5px;
+    padding-top: 8px;
+    width: 160px;
+    height: 180px;
+    font-size: 16px;
+  }
+  .active {
+    border: solid rgb(228, 170, 23) 2px;
+  }
+  .back {
+      display:block;
+      margin: 5px 5px;
+      width: 80px;
+      height: 36px;
+      border: none;
+      border-radius: 5px;
+      background-color: rgb(46, 156, 235);
+      color: white;
+      cursor: pointer;
+    }
