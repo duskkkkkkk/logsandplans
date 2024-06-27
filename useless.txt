@@ -1,0 +1,33 @@
+ // 为创建日志界面的点击按钮添加事件
+        const get_submit = document.querySelector('.createlog button')
+        get_submit.addEventListener('click',function(){
+            // 获取到用户填入的信息
+            const get_name =  document.querySelector('.createlog .inputname')
+            let name = get_name.value
+            const get_content = document.querySelector('.createlog textarea')
+            let content = get_content.value
+            const get_files = document.querySelector('.createlog input[type="file"]')
+            let files = get_files.files
+            let formfiles = new FormData()
+            // 使用axios函数将相关信息传递到后端以创建一条新的日志
+            console.log(files)
+            for(let i = 0;i<files.length;i++){
+                console.log(files[i])
+                formfiles.append('files',files[i])
+            }
+            console.log(formfiles.get('files'))
+            axios({
+                url:'{{ url_for('view_u.createlog') }}',
+                method:'POST',
+                data:{
+                    name: name,
+                    content: content,
+                    files: formfiles.get(files)
+                }
+            }).then(result=>{
+                // 后端传递全新的details 将其赋予全局变量 并重新填充页面
+                details = result.data.details
+                full_showbox(details[0])
+                full_tail(details)
+            })
+        })
